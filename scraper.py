@@ -11,10 +11,6 @@ soup = BeautifulSoup(page.text, 'lxml')
 #Get a list of matches
 matches = [a.get('href') for a in soup.find_all('a', class_='a-reset') if a.get('href').find('matches') == 1]
 
-#Get detailed stats page
-match_page = requests.get(base_url + matches[0])
-match_soup = BeautifulSoup(match_page.text, 'lxml')
-
 with open("stats.txt", "w") as f:
     f.write('match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating\n')
 
@@ -56,7 +52,6 @@ while i < len(matches):
                 rating = row.find('td', class_='st-rating').text
                 with open("stats.txt", "a") as f:
                     f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}\n".format(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating))
-                # print(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating)
     i += 1
 
 
