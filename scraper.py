@@ -61,3 +61,11 @@ while i < len(matches):
 
 
 
+            deaths = row.find('td', class_='st-deaths').text
+            kd_ratio = float(row.find('td', class_='st-kdratio').text.strip("%")) / 100
+            kd_diff = row.find('td', class_='st-kddiff').text.strip("+")
+            adr = row.find('td', class_='st-adr').text
+            fk_dif = row.find('td', class_='st-kddiff').text.strip("+")
+            rating = row.find('td', class_='st-rating').text
+
+            print(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating)
