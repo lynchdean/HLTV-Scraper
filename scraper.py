@@ -1,66 +1,69 @@
-import time
-
 import requests
 from bs4 import BeautifulSoup
 
-# Get a list of matches
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
 base_url = 'https://www.hltv.org'
-page = requests.get(base_url + '/results')
-soup = BeautifulSoup(page.text, 'lxml')
 
-#Get a list of matches
-matches = [a.get('href') for a in soup.find_all('a', class_='a-reset') if a.get('href').find('matches') == 1]
 
 with open("stats.txt", "w") as f:
     f.write('match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating\n')
 
-i = 0
-while i < len(matches):
-    match_page = requests.get(base_url + matches[i])
-    match_soup = BeautifulSoup(match_page.text, 'lxml')
+    pages = 5
+    for page_idx in range(pages):
+        page = requests.get(base_url + '/results?offset=' + str(page_idx * 100), headers=headers)
+        soup = BeautifulSoup(page.text, 'lxml')
 
-    maps_raw = match_soup.find_all('div', class_='mapholder')
-    for map in maps_raw:
-        map_path = map.find('a').get('href')
-        match_id = map_path.split('/')[-2]
-        detailed_page = requests.get(base_url + map_path)
-        detailed_soup = BeautifulSoup(detailed_page.text, 'lxml')
+        #Get a list of matches
+        matches = [a.get('href') for a in soup.find_all('a', class_='a-reset') if a.get('href').find('matches') == 1]
 
-        stats_tables = detailed_soup.find_all('table', class_='stats-table')
-        for table in stats_tables:
-            team_name = table.find('th', class_='st-teamname').text
+        for match in matches:
+            try:
+                match_page = requests.get(base_url + match, headers=headers)
 
-            table_body = table.find('tbody')
-            rows = table_body.find_all('tr')
-            for row in rows:
-                player_name = row.find('td', class_='st-player').text
+                # match_page = requests.get(base_url + matches[0], headers=headers)
+                match_soup = BeautifulSoup(match_page.text, 'lxml')
 
-                kills_hs = (row.find('td', class_='st-kills').text).split(" ")
-                kills = kills_hs[0]
+                maps_raw = match_soup.find_all('div', class_='mapholder')
 
-                headshots = kills_hs[1].strip("(").strip(")")
+                maps_clean = [map.find('a').get('href') for map in maps_raw if map.find('a') is not None]
 
-                assists_fl = row.find('td', class_='st-assists').text.split(" ")
-                assists = assists_fl[0]
-                flash_assists = assists_fl[1].strip("(").strip(")")
+                for map_path in maps_clean:
+                    try:
+                        detailed_page = requests.get(base_url + map_path, headers=headers)
+                        detailed_soup = BeautifulSoup(detailed_page.text, 'lxml')
+                        match_id = map_path.split('/')[-2]
+                        match_info_rows = detailed_soup.find_all('div', class_='match-info-row')
 
-                deaths = row.find('td', class_='st-deaths').text
-                kd_ratio = float(row.find('td', class_='st-kdratio').text.strip("%")) / 100
-                kd_diff = row.find('td', class_='st-kddiff').text.strip("+")
-                adr = row.find('td', class_='st-adr').text
-                fk_dif = row.find('td', class_='st-kddiff').text.strip("+")
-                rating = row.find('td', class_='st-rating').text
-                with open("stats.txt", "a") as f:
-                    f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}\n".format(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating))
-    i += 1
+                        stats_tables = detailed_soup.find_all('table', class_='stats-table')
+                        for table in stats_tables:
+                            team_name = table.find('th', class_='st-teamname').text
 
+                            table_body = table.find('tbody')
+                            rows = table_body.find_all('tr')
+                            for row in rows:
+                                player_name = row.find('td', class_='st-player').text
 
+                                kills_hs = (row.find('td', class_='st-kills').text).split(" ")
+                                kills = kills_hs[0]
 
-            deaths = row.find('td', class_='st-deaths').text
-            kd_ratio = float(row.find('td', class_='st-kdratio').text.strip("%")) / 100
-            kd_diff = row.find('td', class_='st-kddiff').text.strip("+")
-            adr = row.find('td', class_='st-adr').text
-            fk_dif = row.find('td', class_='st-kddiff').text.strip("+")
-            rating = row.find('td', class_='st-rating').text
+                                headshots = kills_hs[1].strip("(").strip(")")
 
-            print(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating)
+                                assists_fl = row.find('td', class_='st-assists').text.split(" ")
+                                assists = assists_fl[0]
+                                if len(assists_fl) > 1:
+                                    flash_assists = assists_fl[1].strip("(").strip(")")
+                                else:
+                                    flash_assists = "N"
+
+                                deaths = row.find('td', class_='st-deaths').text
+                                kd_ratio = '{0:.2g}'.format(float(row.find('td', class_='st-kdratio').text.strip("%"))/100)
+                                kd_diff = row.find('td', class_='st-kddiff').text.strip("+")
+                                adr = row.find('td', class_='st-adr').text
+                                fk_dif = row.find('td', class_='st-kddiff').text.strip("+")
+                                rating = row.find('td', class_='st-rating').text
+                                f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}\n".format(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating))
+                    except requests.exceptions.ConnectionError:
+                        print('timeout')
+                        pass
+            except:
+                pass
