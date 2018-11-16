@@ -8,8 +8,9 @@ base_url = 'https://www.hltv.org'
 with open("stats.txt", "w") as f:
     f.write('match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating\n')
 
-    pages = 5
+    pages = 10
     for page_idx in range(pages):
+        print("Page: " + str(page_idx + 1))
         page = requests.get(base_url + '/results?offset=' + str(page_idx * 100), headers=headers)
         soup = BeautifulSoup(page.text, 'lxml')
 
