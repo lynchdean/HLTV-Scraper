@@ -29,7 +29,6 @@ with open("stats.txt", "w") as f:
                 maps_clean = [map.find('a').get('href') for map in maps_raw if map.find('a') is not None]
 
                 for map_path in maps_clean:
-                    try:
                         detailed_page = requests.get(base_url + map_path, headers=headers)
                         detailed_soup = BeautifulSoup(detailed_page.text, 'lxml')
                         match_id = map_path.split('/')[-2]
@@ -63,8 +62,5 @@ with open("stats.txt", "w") as f:
                                 fk_dif = row.find('td', class_='st-kddiff').text.strip("+")
                                 rating = row.find('td', class_='st-rating').text
                                 f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}\n".format(match_id, team_name, player_name, kills, assists, flash_assists, deaths, kd_ratio, kd_diff, adr, fk_dif, rating))
-                    except requests.exceptions.ConnectionError:
-                        print('timeout')
-                        pass
             except:
                 pass
