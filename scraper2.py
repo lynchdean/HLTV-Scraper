@@ -41,7 +41,7 @@ with open("stats.txt", "w") as f:
                         for row in rows:
                             player_name = row.find('td', class_='st-player').text
 
-                            kills_hs = (row.find('td', class_='st-kills').text).split(" ")
+                            kills_hs = row.find('td', class_='st-kills').text.split(" ")
                             kills = kills_hs[0]
                             headshots = kills_hs[1].strip("(").strip(")")
 
