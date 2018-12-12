@@ -1,24 +1,25 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
-# dataset headers
-names = ['match_id', 'team_name', 'player_name', 'kills', 'assists', 'flash_assists', 'deaths', 'kd_ratio', 'kd_diff',
-         'adr', 'fk_dif', 'rating']
 
-csv_path = 'data2.csv'
-df = pd.read_csv(csv_path, names=names)
+# match_id,team_name,player_name,K,hs,A,f,D,KAST,KD_diff,ADR,fk_dif,rating,
+
+# dataset headers
+df_columns = ['match_id', 'team_name', 'player_name', 'kills', 'headshots', 'assists', 'flash_assists', 'deaths',
+              'kd_ratio', 'kd_diff', 'adr', 'fk_dif', 'rating']
+
+csv_path = '130k_cln.csv'
+df = pd.read_csv(csv_path, names=df_columns, skiprows=1, index_col=False, skipinitialspace=True)
 
 # Preproccessing
-X = df.iloc[:, 3:].values
+X = df.iloc[:, 3:13].values
 y = df.iloc[:, 1].values
 
 # Train test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.50)
 
 # Feature scaling
 scaler = StandardScaler()
