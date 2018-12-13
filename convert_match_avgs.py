@@ -7,7 +7,9 @@ df_columns = ['match_id', 'team_name', 'player_name', 'kills', 'headshots', 'ass
               'kd_ratio', 'kd_diff', 'adr', 'fk_dif', 'rating']
 
 csv_path = '130k_cln.csv'
+# csv_path = 'test.csv'
 df = pd.read_csv(csv_path, names=df_columns, skiprows=1, index_col=False, skipinitialspace=True)
+df.drop_duplicates()
 
 match_ids = df.match_id.unique()
 
@@ -17,19 +19,20 @@ with open('match_avgs.csv', 'w') as csv:
 
         if len(match_df.index) == 10:  # Only add the match if it has the full 10 players.
             team_names = match_df.team_name.unique()
-            for team_name in team_names:
-                team_match_df = df.loc[df['team_name'] == team_name]
 
-                desc_columns = df_columns[:3]
+            for team_name in team_names:
+                team_match_df = match_df.loc[df['team_name'] == team_name]
+
                 data_columns = df_columns[3:]
                 new_row = []
-                for column_name in desc_columns:
-                    new_row.append(str(team_match_df[column_name].iloc[0]))
+                new_row.append(str(match_id))
+                new_row.append(team_name)
+
+                new_row.append(str(round(team_match_df['kills'].mean(), 1)))
 
                 for column_name in data_columns:
                     new_row.append(str(round(team_match_df[column_name].mean(), 1)))
 
                 csv.write(",".join(new_row) + "\n")
-
 print("Done.")
 
