@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 df_columns = ['match_id', 'team_name', 'player_name', 'kills', 'headshots', 'assists', 'flash_assists', 'deaths',
               'kd_ratio', 'kd_diff', 'adr', 'fk_dif', 'rating']
 
-csv_path = '130k_cln.csv'
+csv_path = 'match_avgs_clean.csv'
 df = pd.read_csv(csv_path, names=df_columns, skiprows=1, index_col=False, skipinitialspace=True)
 
 # Preproccessing
@@ -19,7 +19,7 @@ X = df.iloc[:, 3:13].values
 y = df.iloc[:, 1].values
 
 # Train test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.50)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30)
 
 # Feature scaling
 scaler = StandardScaler()
@@ -40,3 +40,7 @@ print(classification_report(y_test, y_pred))
 
 # Accuracy
 print(classifier.score(X_test, y_test))
+
+# Error
+
+
