@@ -3,17 +3,18 @@ import pandas as pd
 # pd.set_option('display.max_row', 1000)
 # pd.set_option('display.max_columns', 50)
 
-df_columns = ['match_id', 'team_name', 'player_name', 'kills', 'headshots', 'assists', 'flash_assists', 'deaths',
+df_columns = ['match_id', 'team_name', 'kills', 'headshots', 'assists', 'flash_assists', 'deaths',
               'kd_ratio', 'kd_diff', 'adr', 'fk_dif', 'rating']
 
-csv_path = '130k_cln.csv'
-# csv_path = 'test.csv'
+csv_path = 'data/130k_manual_cln.csv'
+# csv_path = 'data/test.csv'
+
 df = pd.read_csv(csv_path, names=df_columns, skiprows=1, index_col=False, skipinitialspace=True)
 df.drop_duplicates()
 
 match_ids = df.match_id.unique()
 
-with open('match_avgs.csv', 'w') as csv:
+with open('data/match_avgs.csv', 'w') as csv:
     for match_id in match_ids:
         match_df = df.loc[df['match_id'] == match_id]
 
@@ -34,5 +35,6 @@ with open('match_avgs.csv', 'w') as csv:
                     new_row.append(str(round(team_match_df[column_name].mean(), 1)))
 
                 csv.write(",".join(new_row) + "\n")
+
 print("Done.")
 
