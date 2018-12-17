@@ -18,7 +18,7 @@ for team_name, games_played in team_name_vc.items():
 for team_name in under_game_treshold:
     df = df[df.team_name != team_name]
 
-df.to_csv('data/match_avgs_clean.csv', index=False)
+df.to_csv('../data/match_avgs_clean.csv', index=False)
 print("Done.")
 
 
