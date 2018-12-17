@@ -10,7 +10,7 @@ base_url = 'https://www.hltv.org'
 df_columns = ['match_id', 'team_name', 'player_name', 'kills', 'headshots', 'assists', 'flash_assists', 'deaths',
               'kd_ratio', 'kd_diff', 'adr', 'fk_dif', 'rating']
 
-csv_path = '../data/match_avgs_clean.csv'
+csv_path = '../data/matches_clean.csv'
 df = pd.read_csv(csv_path, names=df_columns, skiprows=1, index_col=False, skipinitialspace=True)
 unique_teams = df.team_name.unique()
 

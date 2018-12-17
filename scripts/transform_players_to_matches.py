@@ -14,7 +14,7 @@ df.drop_duplicates()
 
 match_ids = df.match_id.unique()
 
-with open('../data/match_avgs.csv', 'w') as csv:
+with open('../data/matches.csv', 'w') as csv:
     for match_id in match_ids:
         match_df = df.loc[df['match_id'] == match_id]
 
